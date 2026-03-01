@@ -17,5 +17,5 @@ class Configuration(Base):
     value_type: Mapped[str] = mapped_column(String(20), nullable=False, default="string")
     description: Mapped[str | None] = mapped_column(Text)
     is_sensitive: Mapped[bool] = mapped_column(Boolean, default=False)
-    updated_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     updated_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"))

@@ -19,7 +19,7 @@ class Event(Base):
     event_category: Mapped[str] = mapped_column(String(30), nullable=False)
     event_type: Mapped[str] = mapped_column(String(50), nullable=False)
     event_timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    server_received_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    server_received_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     payload: Mapped[dict] = mapped_column(JSONB, default=dict)
     session_id: Mapped[str | None] = mapped_column(String(36))
 

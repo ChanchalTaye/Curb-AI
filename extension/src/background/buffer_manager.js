@@ -7,16 +7,17 @@
 const BUFFER_KEY = 'curbai_event_buffer';
 const MAX_BUFFER_SIZE = 500;
 
-let sessionId = crypto.randomUUID();
-
 export async function initBufferManager() {
     // Generate a new session ID on startup
-    sessionId = crypto.randomUUID();
+    const sessionId = crypto.randomUUID();
     await chrome.storage.local.set({ curbai_session_id: sessionId });
     console.log('[CurbAI] Buffer manager initialized, session:', sessionId);
 }
 
 export async function addEvent(event) {
+    const config = await chrome.storage.local.get(['curbai_session_id', BUFFER_KEY]);
+    const sessionId = config.curbai_session_id || 'unknown';
+
     const enrichedEvent = {
         ...event,
         session_id: sessionId,
@@ -26,9 +27,7 @@ export async function addEvent(event) {
     const priority = enrichedEvent._priority;
     delete enrichedEvent._priority;
 
-    const result = await chrome.storage.local.get(BUFFER_KEY);
-    let buffer = result[BUFFER_KEY] || [];
-
+    let buffer = config[BUFFER_KEY] || [];
     buffer.push(enrichedEvent);
 
     // Drop oldest events if buffer exceeds max

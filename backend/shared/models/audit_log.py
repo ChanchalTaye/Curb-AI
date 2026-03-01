@@ -19,6 +19,6 @@ class AuditLog(Base):
     resource_type: Mapped[str | None] = mapped_column(String(50))
     resource_id: Mapped[str | None] = mapped_column(String(36))
     detail: Mapped[dict] = mapped_column(JSONB, default=dict)
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     previous_hash: Mapped[str] = mapped_column(String(64), nullable=False)

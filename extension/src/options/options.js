@@ -1,8 +1,5 @@
 /**
  * Options page script — handles backend URL and registration key setup.
- *
- * After registration, the API key is stored encrypted in chrome.storage.local
- * using the Web Crypto API (AES-GCM).
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -15,8 +12,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (config.deviceId) {
         document.getElementById('status-section').style.display = 'block';
-        document.getElementById('conn-status').textContent = `Registered (${config.deviceId.substring(0, 8)}...)`;
+        document.getElementById('device-id-display').textContent = config.deviceId.substring(0, 12) + '...';
+        document.getElementById('backend-display').textContent = config.backendUrl || 'http://localhost:8001';
         document.getElementById('reg-key').placeholder = '••••••••';
+
+        // Test connection
+        testConnection(config.backendUrl || 'http://localhost:8001');
     }
 
     // Save handler
@@ -25,21 +26,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         const regKey = document.getElementById('reg-key').value.trim();
 
         if (!backendUrl) {
-            alert('Backend URL is required');
+            alert('Backend URL is required. Use http://localhost:8001 for local development.');
+            return;
+        }
+
+        // Quick sanity check
+        if (backendUrl.includes('youtube') || backendUrl.includes('google.com') || backendUrl.includes('facebook')) {
+            alert('⚠️ This should be YOUR backend server URL (e.g. http://localhost:8001), not a website you want to monitor!');
             return;
         }
 
         // Store backend URL
         await chrome.storage.local.set({ backendUrl });
 
-        // If a registration key is provided, encrypt and store it
-        if (regKey) {
+        // Generate device ID if not already registered or if a new key is provided
+        const existing = await chrome.storage.local.get(['deviceId']);
+        if (!existing.deviceId || regKey) {
             const deviceId = crypto.randomUUID();
-            const encryptedKey = await encryptKey(regKey);
-            await chrome.storage.local.set({
-                deviceId,
-                encryptedApiKey: encryptedKey,
-            });
+            await chrome.storage.local.set({ deviceId });
         }
 
         // Show success
@@ -48,41 +52,61 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => { successMsg.style.display = 'none'; }, 3000);
 
         // Show status
-        const updated = await chrome.storage.local.get(['deviceId']);
+        const updated = await chrome.storage.local.get(['deviceId', 'backendUrl']);
         if (updated.deviceId) {
             document.getElementById('status-section').style.display = 'block';
-            document.getElementById('conn-status').textContent = `Registered (${updated.deviceId.substring(0, 8)}...)`;
+            document.getElementById('device-id-display').textContent = updated.deviceId.substring(0, 12) + '...';
+            document.getElementById('backend-display').textContent = updated.backendUrl;
+            testConnection(updated.backendUrl);
         }
     });
+
+    document.getElementById('force-sync-btn').addEventListener('click', () => {
+        chrome.alarms.create('immediate-flush', { when: Date.now() + 50 });
+        const syncMsg = document.getElementById('sync-success-msg');
+        syncMsg.style.display = 'block';
+        setTimeout(() => { syncMsg.style.display = 'none'; }, 3000);
+    });
+
+    // --- DEBUG DASHBOARD PIPELINE ---
+    async function updateDebugDashboard() {
+        const data = await chrome.storage.local.get(['curbai_event_buffer', 'last_error']);
+        const buffer = data.curbai_event_buffer || [];
+
+        document.getElementById('debug-buffer-size').textContent = `${buffer.length} events waiting`;
+        document.getElementById('debug-last-error').textContent = data.last_error || 'None';
+
+        const feed = document.getElementById('debug-buffer-feed');
+        if (buffer.length === 0) {
+            feed.style.color = '#888';
+            feed.textContent = "Buffer is completely empty.\nIf you are reading this after clicking around websites, the event collector is fundamentally broken (Chrome permissions issue).";
+        } else {
+            feed.style.color = '#00e676';
+            feed.textContent = JSON.stringify(buffer.map(b => `${b.event_category} -> ${b.event_type}`), null, 2).slice(0, 1000);
+        }
+    }
+
+    document.getElementById('refresh-debug-btn').addEventListener('click', updateDebugDashboard);
+    setInterval(updateDebugDashboard, 3000); // Auto-update every 3s
+    updateDebugDashboard();
 });
 
-/**
- * Encrypt the API key using Web Crypto API (AES-GCM).
- */
-async function encryptKey(plainKey) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(plainKey);
+async function testConnection(backendUrl) {
+    const connStatus = document.getElementById('conn-status');
+    connStatus.textContent = 'Checking...';
+    connStatus.style.color = '#888';
 
-    // Generate a random key for encryption
-    const cryptoKey = await crypto.subtle.generateKey(
-        { name: 'AES-GCM', length: 256 },
-        true,
-        ['encrypt', 'decrypt']
-    );
-
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv },
-        cryptoKey,
-        data
-    );
-
-    // Export the key for storage
-    const exportedKey = await crypto.subtle.exportKey('raw', cryptoKey);
-
-    return {
-        encrypted: Array.from(new Uint8Array(encrypted)),
-        iv: Array.from(iv),
-        key: Array.from(new Uint8Array(exportedKey)),
-    };
+    try {
+        const resp = await fetch(`${backendUrl}/health`, { signal: AbortSignal.timeout(3000) });
+        if (resp.ok) {
+            connStatus.textContent = '● Connected';
+            connStatus.style.color = '#00e676';
+        } else {
+            connStatus.textContent = '● Server error';
+            connStatus.style.color = '#ff5252';
+        }
+    } catch {
+        connStatus.textContent = '● Cannot reach server';
+        connStatus.style.color = '#ff5252';
+    }
 }

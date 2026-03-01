@@ -18,4 +18,4 @@ class ReasoningTrace(Base):
     llm_response_raw: Mapped[str] = mapped_column(Text, nullable=False)
     llm_model_used: Mapped[str] = mapped_column(String(100), nullable=False)
     tokens_used: Mapped[int | None] = mapped_column(Integer)
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())

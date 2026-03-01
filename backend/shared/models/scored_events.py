@@ -20,4 +20,4 @@ class ScoredEvent(Base):
     model_version_id: Mapped[str] = mapped_column(String(36), ForeignKey("ml_models.id"), nullable=False)
     feature_vector: Mapped[dict] = mapped_column(JSONB, default=dict)
     feature_contributions: Mapped[dict] = mapped_column(JSONB, default=dict)
-    scored_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    scored_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())

@@ -28,7 +28,7 @@ async def publish(exchange_name: str, routing_key: str, body: dict) -> None:
     channel = await get_channel()
     exchange = await channel.declare_exchange(exchange_name, aio_pika.ExchangeType.TOPIC, durable=True)
     message = aio_pika.Message(
-        body=json.dumps(body).encode(),
+        body=json.dumps(body, default=str).encode(),
         content_type="application/json",
         delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
     )

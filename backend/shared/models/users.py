@@ -22,8 +22,8 @@ class User(Base):
     org_unit: Mapped[str | None] = mapped_column(String(100))
     external_identity_ref: Mapped[str | None] = mapped_column(String(500))
     account_status: Mapped[str] = mapped_column(String(20), nullable=False, default=AccountStatus.ACTIVE)
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     updated_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )

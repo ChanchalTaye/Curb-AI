@@ -1,41 +1,39 @@
-/**
- * CurbAI Service Worker — the brain of the extension.
- *
- * Responsibilities:
- * - Listen to tab & navigation events
- * - Buffer events in chrome.storage.local
- * - Flush buffer to Ingestion Service every 30 seconds via chrome.alarms
- * - Maintain WebSocket connection for backend commands
- * - Execute commands received from the backend
- */
-
 import { initEventCollector } from './event_collector.js';
 import { initBufferManager, addEvent } from './buffer_manager.js';
-import { initFlushManager } from './flush_manager.js';
 import { initWebSocketClient } from './websocket_client.js';
 
-// Extension lifecycle
+// Extension lifecycle setup
 chrome.runtime.onInstalled.addListener(async () => {
     console.log('[CurbAI] Extension installed');
     await initBufferManager();
-    initEventCollector(addEvent);
-    initFlushManager();
-    initWebSocketClient();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
     console.log('[CurbAI] Extension started');
-    await initBufferManager();
-    initEventCollector(addEvent);
-    initFlushManager();
-    initWebSocketClient();
 });
 
-// Keep Service Worker alive during active monitoring
-chrome.alarms.create('keepalive', { periodInMinutes: 0.33 }); // ~20 seconds
+// Self-healing alarm (Manifest V3 fix for disappearing alarms)
+chrome.alarms.get('curbai-flush', (alarm) => {
+    if (!alarm) {
+        chrome.alarms.create('curbai-flush', { periodInMinutes: 0.5 });
+    }
+});
 
-chrome.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === 'keepalive') {
-        // Worker stays alive; flush manager and WS heartbeat handle their own alarms
+// TOP LEVEL: MUST register listeners here so Service Worker persistence is not broken in Manifest V3
+initEventCollector(addEvent);
+initWebSocketClient();
+
+// Listen for messages from content scripts (scroll tracking, page focus)
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.event_category) {
+        addEvent(message);
+    }
+});
+
+// Top level alarm handler
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name === 'curbai-flush' || alarm.name === 'immediate-flush') {
+        const flushManager = await import('./flush_manager.js');
+        await flushManager.flushBuffer();
     }
 });

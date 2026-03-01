@@ -13,10 +13,20 @@ async def lifespan(app: FastAPI):
     await close_rabbitmq()
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="CurbAI Ingestion Service",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 from .routes.events import router as events_router

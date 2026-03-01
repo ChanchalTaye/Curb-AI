@@ -15,7 +15,7 @@ class MLModel(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     model_type: Mapped[str] = mapped_column(String(50), nullable=False, default="isolation_forest")
-    trained_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    trained_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     training_data_start: Mapped[datetime | None] = mapped_column()
     training_data_end: Mapped[datetime | None] = mapped_column()
     training_sample_count: Mapped[int | None] = mapped_column(Integer)

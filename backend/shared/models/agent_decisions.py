@@ -20,4 +20,4 @@ class AgentDecision(Base):
     confidence: Mapped[float] = mapped_column(Float, nullable=False)
     human_explanation: Mapped[str] = mapped_column(Text, nullable=False)
     reasoning_trace_id: Mapped[str] = mapped_column(String(36), ForeignKey("reasoning_traces.id"), nullable=False)
-    decision_timestamp: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    decision_timestamp: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())

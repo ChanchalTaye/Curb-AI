@@ -18,7 +18,7 @@ class ApprovalQueueEntry(Base):
     queue_type: Mapped[str] = mapped_column(String(30), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="Pending")
     assigned_to: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     decided_at: Mapped[datetime | None] = mapped_column()
     decided_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"))
     approver_note: Mapped[str | None] = mapped_column(Text)

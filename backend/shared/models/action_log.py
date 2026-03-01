@@ -16,6 +16,6 @@ class ActionLogEntry(Base):
     approval_queue_id: Mapped[str] = mapped_column(String(36), ForeignKey("approval_queue.id"), nullable=False)
     action_type: Mapped[str] = mapped_column(String(50), nullable=False)
     target_description: Mapped[str] = mapped_column(String(500), nullable=False)
-    executed_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    executed_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     outcome: Mapped[str] = mapped_column(String(20), nullable=False)
     error_detail: Mapped[str | None] = mapped_column(Text)

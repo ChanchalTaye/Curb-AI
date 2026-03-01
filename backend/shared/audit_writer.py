@@ -28,7 +28,7 @@ async def write_audit(
     previous_hash = result.scalar_one_or_none() or "GENESIS"
 
     record_id = str(uuid.uuid4())
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     detail_json = json.dumps(detail or {}, sort_keys=True)
 
     content_string = f"{record_id}|{event_type}|{actor_id}|{resource_type}|{resource_id}|{detail_json}|{now.isoformat()}"

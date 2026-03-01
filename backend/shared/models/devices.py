@@ -16,6 +16,6 @@ class Device(Base):
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False)
     device_fingerprint: Mapped[str | None] = mapped_column(String(500))
     api_key_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    registered_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    registered_at: Mapped[datetime] = mapped_column(default=lambda: datetime.utcnow())
     last_seen_at: Mapped[datetime | None] = mapped_column()
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
