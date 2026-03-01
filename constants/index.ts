@@ -360,5 +360,5 @@ export const NAV_LINKS = [
 ] as const;
 
 export const LINKS = {
-  sourceCode: "https://github.com/ArjunBora/curb-v1",
+  sourceCode: "https://github.com/ChanchalTaye/Curb-AI",
 };
