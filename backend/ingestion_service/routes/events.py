@@ -1,9 +1,12 @@
-"""POST /ingest/events — receives batched events from the Chrome extension."""
+"""POST /ingest/events — receives batched events from the Chrome extension.
+   GET  /ingest/events/recent — returns recent events for the dashboard.
+"""
 
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_session
@@ -15,6 +18,33 @@ from ..models import EventBatch
 from ..normalizer import normalize_event
 
 router = APIRouter()
+
+
+@router.get("/events/recent")
+async def get_recent_events(
+    limit: int = Query(default=20, ge=1, le=200),
+    session: AsyncSession = Depends(get_session),
+):
+    """Return the most recent events for the dashboard UI."""
+    result = await session.execute(
+        select(Event).order_by(desc(Event.server_received_at)).limit(limit)
+    )
+    events = result.scalars().all()
+    return {
+        "events": [
+            {
+                "id": e.id,
+                "event_category": e.event_category,
+                "event_type": e.event_type,
+                "event_timestamp": e.event_timestamp.isoformat() if e.event_timestamp else None,
+                "server_received_at": e.server_received_at.isoformat() if e.server_received_at else None,
+                "payload": e.payload,
+                "session_id": e.session_id,
+            }
+            for e in events
+        ],
+        "total": len(events),
+    }
 
 
 @router.post("/events", status_code=status.HTTP_202_ACCEPTED)

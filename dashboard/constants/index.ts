@@ -347,18 +347,18 @@ export const FOOTER_DATA = [
 export const NAV_LINKS = [
   {
     title: "Platform",
-    link: "#about-me",
+    link: "/#about-me",
   },
   {
-    title: "Insights",
-    link: "#insights",
+    title: "Live Events",
+    link: "/events",
   },
   {
     title: "Solutions",
-    link: "#projects",
+    link: "/#projects",
   },
 ] as const;
 
 export const LINKS = {
-  sourceCode: "https://github.com/ChanchalTaye/Curb-AI",
+  sourceCode: "https://github.com/ArjunBora/curb-v1",
 };
