@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.whl
+venv/
+.venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# ML Models (large binary files)
+ml/models/*.pkl
+ml/models/*.joblib
+ml/datasets/*.csv
+!ml/datasets/domain_categories_seed.csv
+!ml/models/.gitkeep
+!ml/datasets/.gitkeep
+
+# TLS certs private keys
+infra/nginx/certs/*.key
+infra/nginx/certs/*.pem
+
+# Reports output
+reports_output/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Pytest
+.pytest_cache/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid

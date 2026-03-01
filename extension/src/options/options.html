@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
+        }
+
+        h1 {
+            color: #00d4ff;
+            font-size: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00d4ff;
+            color: #0f0f23;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        button:hover {
+            background: #00b8d9;
+        }
+
+        .success {
+            color: #00e676;
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .status-section {
+            margin-top: 24px;
+            padding: 14px;
+            background: #1a1a2e;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>CurbAI — Setup</h1>
+
+    <div class="form-group">
+        <label for="backend-url">Backend URL</label>
+        <input type="url" id="backend-url" placeholder="http://localhost:8001">
+    </div>
+
+    <div class="form-group">
+        <label for="reg-key">Device Registration Key</label>
+        <input type="password" id="reg-key" placeholder="Paste your registration key">
+    </div>
+
+    <button id="save-btn">Save & Register</button>
+    <div class="success" id="success-msg">✅ Configuration saved successfully</div>
+
+    <div class="status-section" id="status-section" style="display: none;">
+        <label>Connection Status</label>
+        <span id="conn-status">Checking...</span>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+
+</html>

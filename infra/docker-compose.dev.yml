@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  ingestion:
+    volumes:
+      - ../backend:/app
+    command: [ "uvicorn", "ingestion_service.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload" ]
+
+  intelligence:
+    volumes:
+      - ../backend:/app
+    command: [ "uvicorn", "intelligence_service.main:app", "--host", "0.0.0.0", "--port", "8002", "--reload" ]
