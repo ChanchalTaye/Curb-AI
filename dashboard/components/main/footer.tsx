@@ -8,11 +8,12 @@ const NAV_COLS = [
   {
     title: "CurbAI",
     links: [
-      { name: "Home", href: "#hero" },
-      { name: "About us", href: "#about" },
-      { name: "Pricing", href: "#pricing" },
-      { name: "Customer Stories", href: "#stories" },
-      { name: "Contact us", href: "#contact" },
+      { name: "Home", href: "/#hero" },
+      { name: "About us", href: "/#about" },
+      { name: "Pricing", href: "/#pricing" },
+      { name: "Customer Stories", href: "/#stories" },
+      { name: "Contact us", href: "/#contact" },
+      { name: "Extension", href: "/extension/curbai-extension.zip" },
     ],
   },
   {
